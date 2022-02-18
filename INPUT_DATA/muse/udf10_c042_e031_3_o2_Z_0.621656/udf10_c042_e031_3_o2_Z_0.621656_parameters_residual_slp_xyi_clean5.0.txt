@@ -1,0 +1,2 @@
+     mean(resv)   median(resv)    stdev(resv)      min(resv)      max(resv)     mean(resd)   median(resd)    stdev(resd)      min(resd)      max(resd)
+  5.3842384E+01  1.9019897E+01  7.8470566E+01 -6.4649178E+01  3.0393198E+02  5.7262226E+01  4.9138592E+01  3.4049587E+01  0.0000000E+00  1.7365102E+02
