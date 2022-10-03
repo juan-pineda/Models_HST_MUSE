@@ -1,7 +1,6 @@
 
 import cv2
 
-
 # define the right path to the data folders in this module
 from config import *
 
@@ -414,7 +413,6 @@ def erode_sky(mask,n,iterations=1):
     erosion = cv2.erode(mask,kernel,iterations = iterations)
     return erosion
 
-######## NEW FUNCTIONS For PSF measurements ###########
 
 
 
