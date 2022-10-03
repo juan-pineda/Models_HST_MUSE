@@ -1,4 +1,4 @@
-# Models_HST_MUSE
+# Models\_HST\_MUSE
 Library for mocking MUSE OII line flux maps using HST images
 
 Here are the most important functions to allow the creation of such models.
@@ -15,5 +15,16 @@ that, and also to perform the true model fitting with serious statistical
 meaning. Meanwhile, the example creates just a toy model to allow you grasping
 the most important features of the code, so later on you can go as far as you
 want.  
+
+# Measurements of the SKY
+
+The procedure for measuring sky is now included in this repo. Check the script
+"sky\_authomatic.py". Some functions specifically dedicated for this task were
+added to the module "basic\_functions.py", clearly separated by a distinct mark
+and title, below the body of functions already present in there.
+
+
+
+
 
 

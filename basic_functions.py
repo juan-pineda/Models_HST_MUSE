@@ -1,3 +1,7 @@
+
+import cv2
+
+
 # define the right path to the data folders in this module
 from config import *
 
@@ -334,4 +338,85 @@ def rebin_header(header,oversampling):
     hdr["CRPIX1"] = new_crpix1
     hdr["CRPIX2"] = new_crpix2
     return hdr
+
+
+
+######## NEW FUNCTIONS For sky measurements ###########
+
+def mask_sky(gal):
+    """
+    Reads the segmentation mask, and returns a mask to separate SKY
+    TRUE: in sky pixels
+    FALSE: in source pixels
+
+    mask = mask indicating the sky pixels with 1
+    header = header from the original segmentation mask
+    seg_mask = original segmentation mask
+    """
+    # Read the segmentation mask
+    segmentation_mask = fits.open(segmendir+'/udf_mosaic_'+gal+'_HST_SEGMAP.fits')
+    seg_mask = segmentation_mask[1].data
+    header = segmentation_mask[1].header
+    # Check for sky values
+    index = (seg_mask == 0)
+    mask = seg_mask.copy()
+    mask[index] = 1 # sky pixels
+    mask[~index] = 0 # sources
+    mask = mask.astype(bool)
+    return mask, header, seg_mask
+
+def interpolate_mask(mask,header,hdul):
+    """
+    Receives the Sky mask, its parent header, and the image
+    over which the sky is to be calculated
+    Sky mask is interpolated to the nearest in the frame of
+    reference of the image
+    Returns a mask in this new coordinates
+    """
+    x,y = oversampled_positions(mask, oversampling=1)
+    xx,yy = np.meshgrid(x,y)
+    pixcrd = np.column_stack((np.ravel(yy),np.ravel(xx)))
+    world = get_wcs_coordinates(pixcrd, header)
+    # interpolator is created in target frame of reference
+    pixcrd2 = get_pixel_coordinates(world, hdul[0].header)
+    interp = interpolate.NearestNDInterpolator(pixcrd2, np.ravel(mask.T).T)
+    # Let's apply the mask to the HST image
+    x,y = oversampled_positions(hdul[0].data, oversampling=1)
+    xx,yy = np.meshgrid(x,y)
+    pixcrd = np.column_stack((np.ravel(yy),np.ravel(xx)))
+    new_mask = interp(pixcrd[:,0],pixcrd[:,1]).reshape(xx.shape).T
+    new_mask = new_mask.astype(float)
+    return new_mask
+
+
+def get_sky_n_fluctuations(hdul,new_mask,graph=False,filename="histogram.png"):
+    """
+    From an image and a mask, estimates median and standard
+    deviation from masked pixels, optionally storing an histogram
+    """
+    index = np.where(new_mask)
+    sky = np.median(hdul[0].data[index])
+    std = np.std(hdul[0].data[index])
+    N = index[0].size
+    if graph:
+        plt.figure(facecolor='White')
+        plt.hist(np.ravel(hdul[0].data[index]),bins=40)
+        plt.axvline(x=sky,color="red")
+        plt.title('median sky = '+str(np.round(sky,3))+'   std dev = '+str(np.round(std,3)) + '  N = '+str(N))
+        plt.savefig(filename)
+        plt.clf()
+        plt.close()
+
+    return sky,std
+
+def erode_sky(mask,n,iterations=1):
+    kernel = np.ones((n,n),np.uint8)
+    erosion = cv2.erode(mask,kernel,iterations = iterations)
+    return erosion
+
+######## NEW FUNCTIONS For PSF measurements ###########
+
+
+
+
 

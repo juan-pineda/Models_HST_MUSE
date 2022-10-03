@@ -20,7 +20,7 @@ folder_muse = "./INPUT_DATA/muse/"
 folder_hst = "./INPUT_DATA/new_stamps/"
 redshifts_file = "./INPUT_DATA/redshifts.txt"
 folder_sky = "./INPUT_DATA/NEW_SKY/"
-segmendir = "./INPUT_DATA/mosaics"
+segmendir = "./INPUT_DATA/segment_maps/"
 
 
 # Measured in pixels of MUSE data - (pixel = 0.2 arcsec)
